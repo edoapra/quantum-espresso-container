@@ -13,8 +13,12 @@ Stage: spython-base
 # Set environment variables
 DEBIAN_FRONTEND=noninteractive
 QE_VERSION="7.4.1"
+%setup
+    ls -la  ${GITHUB_WORKSPACE} \
+&&     export CACHEDIR=${GITHUB_WORKSPACE}/../../../cache\
+&&     bash -c "if [[  -f ${CACHEDIR}/ompi/lib/libmpi.so ]]; then mkdir -p ${SINGULARITY_ROOTFS}/opt ;rsync -a ${CACHEDIR}/ompi ${SINGULARITY_ROOTFS}/opt/. ; echo ompi/ucx cache fetched ;fi"
 
-
+%post
 # Install required packages
 apt-get update && apt-get install -y \
 build-essential \
@@ -63,7 +67,6 @@ export ompi_options=' --enable-mca-no-build=coll-han '
 && export ompi_minor=$(echo $OMPI | cut -d . -f2) \
 && echo ompi_minor is $ompi_minor \
 && echo ompi_major is $ompi_major \
-&&     bash -c "if [[  -f ${CACHEDIR}/ompi/lib/libmpi.so ]]; then mkdir -p ${SINGULARITY_ROOTFS}/opt ;rsync -a ${CACHEDIR}/ompi ${SINGULARITY_ROOTFS}/opt/. ; echo ompi/ucx cache fetched ;fi"\
 && wget --progress=dot:giga  https://github.com/openucx/ucx/releases/download/v$UCX/ucx-$UCX.tar.gz -O - | tar xzf - \
 && wget  --progress=dot:giga https://download.open-mpi.org/release/open-mpi/v$ompi_major.$ompi_minor/openmpi-$OMPI.tar.gz  -O - | tar xzf -   \
 && cd ucx-$UCX \

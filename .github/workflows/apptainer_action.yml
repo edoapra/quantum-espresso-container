@@ -76,7 +76,11 @@ jobs:
         cd ..
     - name: build an apptainer container
       run: |
-        cd ${{ matrix.folder }}
+        env|grep GITH
+        ls -lrta
+        pwd
+        find . -name ${{ matrix.folder }}
+        cd $(find . -name ${{ matrix.folder }})
         QE_VERSION=$QE_VERSION CUDA_CC=$CUDA_CC CUDA_RUNTIME=$CUDA_RUNTIME  apptainer build --fakeroot ${{ matrix.folder }}.simg  Singularity
     - name: store cache
       run: |
