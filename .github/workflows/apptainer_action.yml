@@ -1,0 +1,97 @@
+name: q_apptainer
+
+on:
+  schedule:
+    - cron: '0 0 * * SUN'
+  repository_dispatch:
+    types: [backend_automation]
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build_image:
+    runs-on: ubuntu-22.04
+    strategy:
+        fail-fast: true
+        matrix:
+          folder:
+            - qe_gpu
+          qe_version:
+            - 7.4.1
+          cuda-cc:
+            - 90
+          cuda-runtime:
+            - 13.0
+    env:
+        QE_VERSION: ${{ matrix.qe_version }}
+        CUDA_CC: ${{ matrix.cuda-cc }}
+        CUDA_RUNTIME: ${{ matrix.cuda-runtime }}
+    steps:
+    - name: tag
+      run: |
+        echo "tag=oras://ghcr.io/${{ github.repository }}/qe-${{ matrix.qe_version}}.cuda-cc${{ matrix.cuda-cc}}.cuda-rt${{ matrix.cuda-runtime }}" >> $GITHUB_ENV
+    - name: echo-tag
+      run: |
+        echo ' the apptainer tag is ' "${{ env.tag }}"
+    - name: Checkout nwchem-singularity source
+      uses: actions/checkout@v6
+#      with:
+#        repository: edoapra/quantum-espresso-container
+#        clean: false
+#        path: quantum-espresso-container
+    - name: pkg cleanup
+      uses: edoapra/ubuntu-pkg-cleanup@main
+    - name: Setup cache
+      id: setup-cache
+      uses: actions/cache@v5
+      with:
+        path: |
+          ~/cache
+        key: ${{ env.tag }}
+    - name: fetch cache
+      if: steps.setup-cache.outputs.cache-hit == 'true'
+      run: |
+        ls -lart ~/cache
+        if [[ -f ~/cache/ompi/lib/libmpi.so ]]; then \
+        echo "ompi cache present" ; \
+        fi
+    - name: Install apptainer
+      env:
+        APP_VER: 1.2.3
+      run: |
+        sudo apt-get install -y  libfuse2 libseccomp2 zlib1g uidmap squashfs-tools squashfuse fuse2fs fuse-overlayfs fakeroot
+        wget -q  https://github.com/apptainer/apptainer/releases/download/v${APP_VER}/apptainer_${APP_VER}_amd64.deb 
+        sudo dpkg -i apptainer_${APP_VER}_amd64.deb
+        which apptainer
+        apptainer version
+    - name: create sif from docker
+      if: steps.setup-cache.outputs.cache-hit != 'true'
+      run: |
+          cd ${{ matrix.folder }}
+          apptainer pull docker://ubuntu:jammy
+    - name: build an apptainer container
+      run: |
+        cd ${{ matrix.folder }}
+        QE_VERSION=$QE_VERSION CUDA_CC=$CUDA_CC CUDA_RUNTIME=$CUDA_RUNTIME  apptainer build --fakeroot ${{ matrix.folder }}.simg  Singularity
+    - name: store cache
+      run: |
+        mkdir -p ~/cache || true
+        cd ${{ matrix.folder }}
+        apptainer exec ${{ matrix.folder }}.simg cp -r /opt/ompi ~/cache
+        cp ubuntu_jammy.sif ~/cache/.
+        echo "cache stored"
+        ls -l ~/cache
+    - name: builddate
+      id: build-date
+      run: |
+        echo "date=$(TZ=America/Los_Angeles date +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
+    - name: push to ghcr.io
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | apptainer remote login -u ${{ github.actor }} --password-stdin oras://ghcr.io
+        apptainer remote list
+        tries=0 ; until [ "$tries" -ge 5 ] ; do \
+        apptainer push ${{ matrix.folder }}/${{ matrix.folder }}.simg ${{ env.tag }}:${{ env.date }} && break ; \
+        tries=$((tries+1)) ; echo push1 attempt no.  $tries    ; sleep 30 ; done
+        tries=0 ; until [ "$tries" -ge 5 ] ; do \
+        apptainer push ${{ matrix.folder }}/${{ matrix.folder }}.simg ${{ env.tag }}:latest && break ; \
+        tries=$((tries+1)) ; echo push2 attempt no.  $tries    ; sleep 30 ; done
