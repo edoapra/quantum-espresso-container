@@ -70,8 +70,7 @@ jobs:
       run: |
         ls -lrta
         pwd
-        find . -name ${{ matrix.folder }}
-        cd $(find . -name ${{ matrix.folder }})
+        cd ${{ matrix.folder }})
         apptainer pull docker://ubuntu:jammy
         cd ..
     - name: build an apptainer container
@@ -79,8 +78,8 @@ jobs:
         env|grep GITH
         ls -lrta
         pwd
-        find . -name ${{ matrix.folder }}
-        cd $(find . -name ${{ matrix.folder }})
+        cd ${{ matrix.folder }}
+        ls -lart
         QE_VERSION=$QE_VERSION CUDA_CC=$CUDA_CC CUDA_RUNTIME=$CUDA_RUNTIME  apptainer build --fakeroot ${{ matrix.folder }}.simg  Singularity
     - name: store cache
       run: |
