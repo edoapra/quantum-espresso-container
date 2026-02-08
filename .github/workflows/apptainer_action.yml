@@ -1,6 +1,7 @@
 name: q_apptainer
 
 on:
+  push:
   schedule:
     - cron: '0 0 * * SUN'
   repository_dispatch:
@@ -72,6 +73,7 @@ jobs:
         find . -name ${{ matrix.folder }}
         cd $(find . -name ${{ matrix.folder }})
         apptainer pull docker://ubuntu:jammy
+        cd ..
     - name: build an apptainer container
       run: |
         cd ${{ matrix.folder }}
