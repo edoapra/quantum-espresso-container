@@ -29,11 +29,11 @@ jobs:
     steps:
     - name: tag
       run: |
-        echo "tag=oras://ghcr.io/${{ github.repository }}/qe-${{ matrix.qe_version}}.cuda-cc${{ matrix.cuda-cc}}.cuda-rt${{ matrix.cuda-runtime }}" >> $GITHUB_ENV
+        echo "tag=oras://ghcr.io/${{ github.repository }}/qe_apptainer-${{ matrix.qe_version}}.cuda-cc${{ matrix.cuda-cc}}.cuda-rt${{ matrix.cuda-runtime }}" >> $GITHUB_ENV
     - name: echo-tag
       run: |
         echo ' the apptainer tag is ' "${{ env.tag }}"
-    - name: Checkout nwchem-singularity source
+    - name: Checkout qes-singularity source
       uses: actions/checkout@v6
 #      with:
 #        repository: edoapra/quantum-espresso-container
@@ -67,8 +67,11 @@ jobs:
     - name: create sif from docker
       if: steps.setup-cache.outputs.cache-hit != 'true'
       run: |
-          cd ${{ matrix.folder }}
-          apptainer pull docker://ubuntu:jammy
+        ls -lrta
+        pwd
+        find . -name ${{ matrix.folder }}
+        cd $(find . -name ${{ matrix.folder }})
+        apptainer pull docker://ubuntu:jammy
     - name: build an apptainer container
       run: |
         cd ${{ matrix.folder }}
