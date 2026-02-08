@@ -16,7 +16,7 @@ jobs:
         fail-fast: true
         matrix:
           folder:
-            - qe_gpu
+            - qe-gpu
           qe_version:
             - 7.4.1
           cuda-cc:
@@ -72,7 +72,6 @@ jobs:
         pwd
         cd ${{ matrix.folder }})
         apptainer pull docker://ubuntu:jammy
-        cd ..
     - name: build an apptainer container
       run: |
         env|grep GITH
