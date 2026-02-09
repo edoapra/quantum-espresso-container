@@ -66,7 +66,7 @@ apt-get -y update \
 	    && arch_dpkg=$(dpkg --print-architecture)
 	    echo nverdash $nverdash
 	    echo nverdot $nverdot
-apt-get install -q=2 -y --no-install-recommends g++ libtinfo5  libncursesw5 libnuma1
+apt-get install -q=2 -y --no-install-recommends g++ libtinfo5  libncursesw5 libnuma1 libopenblas-serial-dev
 set -ex
 wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"_"$nverdot"-0_"$arch_dpkg".deb
 wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"-cuda-multi_"$nverdot"-0_"$arch_dpkg".deb
