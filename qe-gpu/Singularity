@@ -72,19 +72,29 @@ wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"
 wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"-cuda-multi_"$nverdot"-0_"$arch_dpkg".deb
 ls -lrt nv*deb || true
  dpkg -i *deb
-set +ex
-/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/makelocalrc -x  ;   rm -f nvhpc*deb
+
+/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/makelocalrc -x  ;   rm -
+f nvhpc*deb
 mkdir -p /opt/lib || true  
 	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.   || true
 	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt/lib/.   || true
  apt-get clean && rm -rf /var/lib/apt/lists/*
- export FC=nvfortran && export OMPI=5.0.9 &&export OMPI_DIR=/opt/ompi && export UCX=1.20.0 
+
+export FC=nvfortran && export OMPI=5.0.9 &&export OMPI_DIR=/opt/ompi && export UCX=1.20.0
+
+echo "ls cuda rt available" ls /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/
+
 export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/"$arch"-linux/ 
- export PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin:"$PATH" 
- export LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib:"$LD_LIBRARY_PATH" 
+
+export PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin:$PATH
+
+export LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib:"$LD_LIBRARY_PATH" 
 echo 'FC -v ' $("$FC" -v)
+
 rm -f nvcc.out && nvcc -V >& nvcc.out && cat nvcc.out && rm nvcc.out 
-   export ompi_prefix=openmpi-$OMPI\
+set +ex
+
+export ompi_prefix=openmpi-$OMPI\
 && export ompi_major=$(echo $OMPI | cut -d . -f1) \
 && echo ompi_major is $ompi_major \
 && export ompi_minor=$(echo $OMPI | cut -d . -f2) \
