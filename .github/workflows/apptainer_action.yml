@@ -22,28 +22,19 @@ jobs:
           cuda-cc:
             - 90
             - cpu
-          cuda-runtime:
-            - "13.0"
     env:
         QE_VERSION: ${{ matrix.qe_version }}
         CUDA_CC: ${{ matrix.cuda-cc }}
-        CUDA_RUNTIME: ${{ matrix.cuda-runtime }}
     steps:
     - name: tag
       run: |
-        echo "tag=oras://ghcr.io/${{ github.repository }}/qe_apptainer-${{ matrix.qe_version}}.cuda-cc${{ matrix.cuda-cc}}.cuda-rt${{ matrix.cuda-runtime }}" >> $GITHUB_ENV
+        echo "tag=oras://ghcr.io/${{ github.repository }}/qe_apptainer-${{ matrix.qe_version}}.cuda_arch_${{ matrix.cuda-cc}}" >> $GITHUB_ENV
     - name: echo-tag
       run: |
         echo ' the apptainer tag is ' "${{ env.tag }}"
-        echo CUDA_RUNTIME $CUDA_RUNTIME
         echo CUDA_CC $CUDA_CC
-        echo CUDA_RUNTIME $CUDA_RUNTIME
     - name: Checkout qes-singularity source
       uses: actions/checkout@v6
-#      with:
-#        repository: edoapra/quantum-espresso-container
-#        clean: false
-#        path: quantum-espresso-container
     - name: pkg cleanup
       uses: edoapra/ubuntu-pkg-cleanup@main
     - name: Setup cache
@@ -82,7 +73,7 @@ jobs:
         pwd
         cd ${{ matrix.folder }}
         ls -lart
-        QE_VERSION=$QE_VERSION CUDA_CC=$CUDA_CC CUDA_RUNTIME=$CUDA_RUNTIME  apptainer build --fakeroot ${{ matrix.folder }}.simg  Singularity
+        QE_VERSION=$QE_VERSION CUDA_CC=$CUDA_CC apptainer build --fakeroot ${{ matrix.folder }}.simg  Singularity
     - name: store cache
       run: |
         mkdir -p ~/cache || true
