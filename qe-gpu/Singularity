@@ -11,7 +11,6 @@ Stage: spython-base
 # Start from NVIDIA CUDA base image
 
 # Set environment variables
-DEBIAN_FRONTEND=noninteractive
 QE_VERSION="7.4.1"
 %setup
     ls -la  ${GITHUB_WORKSPACE} \
@@ -19,11 +18,13 @@ QE_VERSION="7.4.1"
 &&     bash -c "if [[  -f ${CACHEDIR}/ompi/lib/libmpi.so ]]; then mkdir -p ${SINGULARITY_ROOTFS}/opt ;rsync -a ${CACHEDIR}/ompi ${SINGULARITY_ROOTFS}/opt/. ; echo ompi/ucx cache fetched ;fi"
 
 %post
+export DEBIAN_FRONTEND=noninteractive
 echo QE_VERSION $QE_VERSION
 echo CUDA_CC $CUDA_CC
 echo $CUDA_RUNTIME CUDA_RUNTIME
 # Install required packages
-apt-get update && apt-get install -y \
+apt-get update && apt-get install -y tzdata \
+apt-get install -y \
 build-essential \
 wget \
 git \
@@ -153,7 +154,6 @@ rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name 12.9)
 # ENTRYPOINT ["/entrypoint.sh"]
 # CMD ["pw.x"]
 %environment
-export DEBIAN_FRONTEND=noninteractive
 export QE_VERSION="7.4"
 %runscript
 cd /work
