@@ -73,8 +73,8 @@ wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"
 ls -lrt nv*deb || true
  dpkg -i *deb
 
-/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/makelocalrc -x  ;   rm -
-f nvhpc*deb
+/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/makelocalrc -x
+rm -f nvhpc*deb  || true
 mkdir -p /opt/lib || true  
 	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.   || true
 	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt/lib/.   || true
