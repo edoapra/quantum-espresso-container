@@ -160,7 +160,6 @@ cd /build
 # Configure and build Quantum ESPRESSO with GPU support using NVHPC
 mkdir -p /build/q-e-qe-${QE_VERSION}
 cd /build/q-e-qe-${QE_VERSION}
-export CC=pgcc
 if [ ${CUDA_CC} = "cpu" ]; then
 cuda_options="--with-cuda=no"
 else
