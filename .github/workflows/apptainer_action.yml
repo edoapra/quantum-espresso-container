@@ -22,7 +22,7 @@ jobs:
           cuda-cc:
             - 90
           cuda-runtime:
-            - 13.0
+            - "13.0"
     env:
         QE_VERSION: ${{ matrix.qe_version }}
         CUDA_CC: ${{ matrix.cuda-cc }}
@@ -34,6 +34,9 @@ jobs:
     - name: echo-tag
       run: |
         echo ' the apptainer tag is ' "${{ env.tag }}"
+        echo CUDA_RUNTIME $CUDA_RUNTIME
+        echo CUDA_CC $CUDA_CC
+        echo CUDA_RUNTIME $CUDA_RUNTIME
     - name: Checkout qes-singularity source
       uses: actions/checkout@v6
 #      with:
