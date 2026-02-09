@@ -28,20 +28,6 @@ export `cat ./cuda_runtime.txt`
 echo QE_VERSION $QE_VERSION
 echo CUDA_CC $CUDA_CC
 echo $CUDA_RUNTIME CUDA_RUNTIME
-# Install required packages
-apt-get update && apt-get install -y tzdata \
-apt-get install -y \
-build-essential \
-wget \
-git \
-python3 \
-python3-pip \
-gfortran \
-pkg-config \
-make \
-cmake \
-&& apt-get clean \
-&& rm -rf /var/lib/apt/lists/*
 
 # Create working directory
 mkdir -p /build
@@ -50,16 +36,17 @@ cd /build
 #build ompi ucx
 export ompi_options=' --enable-mca-no-build=coll-han ' 
 apt-get -y update \
-&& apt-get -y install -y tzdata git moreutils  wget rsync  sudo ca-certificates \
+&& apt-get install -y tzdata  \
+&& apt-get -y install -y build-essential wget giit python3 python3-pip pkg-config  moreutils  wget rsync  sudo ca-certificates \
 && apt-get -y install -y   tar libnl-3-200 libnl-route-3-200 libgomp1 libnuma1 \
- g++ gfortran   make ssh patch   unzip perl-base file \
- python3 python3-dev cmake  unzip zip perl automake libtool autoconf flex  \
+ g++ gfortran    ssh patch   unzip  file \
+ make cmake  unzip zip automake libtool autoconf flex  \
  libnuma-dev libslurm-dev \
  libnl-3-dev  libnl-route-3-dev udev \
  librdmacm-dev librdmacm1 rdma-core libibverbs-dev  ibverbs-providers  \
  libhwloc-dev libfuse3-dev\
- pkg-config gawk  software-properties-common strace gdb \
- g++ libtinfo5  libncursesw5 libnuma1 libopenblas0-serial libfftw3-dev
+ gawk  software-properties-common strace gdb \
+ libtinfo5  libncursesw5 libnuma1 libopenblas0-serial libfftw3-dev
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 
  apt-get clean && rm -rf /var/lib/apt/lists/*
  
