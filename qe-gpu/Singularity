@@ -60,6 +60,10 @@ apt-get -y update \
  libhwloc-dev libfuse3-dev\
  pkg-config gawk  software-properties-common strace gdb
  
+if [ $CUDA_CC = "cpu" ]; then
+export FC=gfortran
+else
+export FC=nvfortran
  nv_year=2025 && nv_major=25 &&  nv_minor=11 &&   nverdot="$nv_major"."$nv_minor" && nverdash="$nv_major"-"$nv_minor" \
 	    && arch=$(uname -m) \
 	    && echo arch is "$arch" \
@@ -82,20 +86,16 @@ rsync -a  /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/compat/* /opt/lib/. 
 rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/x86_64-linux/lib/* /opt/lib/. 
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 
  apt-get clean && rm -rf /var/lib/apt/lists/*
-
-export FC=nvfortran && export OMPI=5.0.9 &&export OMPI_DIR=/opt/ompi && export UCX=1.20.0
-
 echo "ls cuda rt available" $(ls /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/)
-
 export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/"$arch"-linux/ 
-
 export PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin:$PATH
-
 export LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib:"$LD_LIBRARY_PATH" 
-echo 'FC -v ' $("$FC" -v)
 ls -lrt /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/nv*
+fi
+export OMPI=5.0.9 &&export OMPI_DIR=/opt/ompi && export UCX=1.20.0
 
-#rm -f nvcc.out && nvcc -V >& nvcc.out && cat nvcc.out && rm nvcc.out 
+echo 'FC -v ' $("$FC" -v)
+
 #set +ex
 
 export ompi_prefix=openmpi-$OMPI 
@@ -160,15 +160,18 @@ cd /build
 mkdir -p /build/q-e-qe-${QE_VERSION}
 cd /build/q-e-qe-${QE_VERSION}
 export CC=pgcc
+if [ ${CUDA_CC} = "cpu" ]; then
+cuda_options="--with-cuda=no"
+else
+cuda_options="--with-cuda=yes --with-cuda-cc=${CUDA_CC} --with-cuda-runtime=13.0 --with-cuda-mpi=yes"
+fi
+echo cuda_options $cuda_options
 # Configure with NVHPC compiler
 ./configure \
 --enable-openmp \
 --enable-parallel \
 --with-scalapack=yes \
---with-cuda=yes \
---with-cuda-cc=90 \
---with-cuda-runtime=13.0 \
---with-cuda-mpi=yes \
+$cuda_options \
 && make pw -j$(nproc) \
 && make cp -j$(nproc) \
 && make ph -j$(nproc) \
@@ -180,7 +183,7 @@ mkdir -p /work
 cd /work
 #cleanup
 rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name 12.9) || true
-rm -rf /opt/nvidia
+rm -rf /opt/nvidia || true
 # # Add environment setup script
 # RUN echo '#!/bin/bash\n\
 # export CUDA_VISIBLE_DEVICES=${GPU_ID:-0}\n\

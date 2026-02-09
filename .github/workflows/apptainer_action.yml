@@ -21,6 +21,7 @@ jobs:
             - 7.4.1
           cuda-cc:
             - 90
+            - cpu
           cuda-runtime:
             - "13.0"
     env:
