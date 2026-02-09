@@ -17,7 +17,6 @@ QE_VERSION="7.4.1"
 &&     export CACHEDIR=${GITHUB_WORKSPACE}/../../../cache\
 &&     bash -c "if [[  -f ${CACHEDIR}/ompi/lib/libmpi.so ]]; then mkdir -p ${SINGULARITY_ROOTFS}/opt ;rsync -a ${CACHEDIR}/ompi ${SINGULARITY_ROOTFS}/opt/. ; echo ompi/ucx cache fetched ;fi" \
 &&     bash -c "if [[ -z '${QE_VERSION}' ]]; then echo 'QE_VERSION=7.4.1 ' >> ${SINGULARITY_ROOTFS}/qe_version.txt ; else echo 'QE_VERSION is ${QE_VERSION}'; echo 'QE_VERSION=${QE_VERSION} ' >> ${SINGULARITY_ROOTFS}/qe_version.txt ; fi"\
-&&     bash -c "if [[ -z '${CUDA_RUNTIME}' ]]; then echo 'CUDA_RUNTIME=13.0 ' >> ${SINGULARITY_ROOTFS}/cuda_runtime.txt ; else echo 'CUDA_RUNTIME is ${CUDA_RUNTIME}'; echo 'CUDA_RUNTIME=${CUDA_RUNTIME} ' >> ${SINGULARITY_ROOTFS}/cuda_runtime.txt ; fi"\
 &&     bash -c "if [[ -z '${CUDA_CC}' ]]; then echo 'CUDA_CC=90 ' >> ${SINGULARITY_ROOTFS}/cuda_cc.txt ; else echo 'CUDA_CC is ${CUDA_CC}'; echo 'CUDA_CC=${CUDA_CC} ' >> ${SINGULARITY_ROOTFS}/cuda_cc.txt ; fi"
 
 %post
@@ -27,7 +26,6 @@ export `cat ./cuda_cc.txt`
 export `cat ./cuda_runtime.txt`
 echo QE_VERSION $QE_VERSION
 echo CUDA_CC $CUDA_CC
-echo $CUDA_RUNTIME CUDA_RUNTIME
 
 # Create working directory
 mkdir -p /build
@@ -77,7 +75,8 @@ CUDA_RUNTIME=$(nvcc --version |grep Cuda\ compilation | cut -d " " -f 5|sed -e s
 echo CUDA_RUNTIME is $CUDA_RUNTIME
 rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.   || true
 rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt/lib/.   || true
-rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/x86_64-linux/lib/* /opt/lib/. 
+rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/x86_64-linux/lib/* /opt/lib/.
+rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/compat/ /opt/lib/.
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 
  apt-get clean && rm -rf /var/lib/apt/lists/*
 export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/"$arch"-linux/ 
