@@ -63,12 +63,11 @@ apt-get -y update \
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 
  apt-get clean && rm -rf /var/lib/apt/lists/*
  
+export CC=gcc
 if [ $CUDA_CC = "cpu" ]; then
 export FC=gfortran
-export CC=gcc
 else
 export CC=nvc 
-export FC=nvfortran
  nv_year=2025 && nv_major=25 &&  nv_minor=11 &&   nverdot="$nv_major"."$nv_minor" && nverdash="$nv_major"-"$nv_minor" \
 	    && arch=$(uname -m) \
 	    && echo arch is "$arch" \
@@ -119,7 +118,7 @@ echo ompi cache missing
  cd ucx-$UCX 
  wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi41x.ifx/ucx_malloc.patch 
  wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi5x/ucx1181_malloc.patch 
- if [[ $UCX == 1.14.1 ]] || [[ $UCX == 1.15.0 ]]; then patch -p0 < ./ucx_malloc.patch ; else patch -p0 < ./ucx1181_malloc.patch; fi 
+ if [ $UCX == 1.14.1 ] || [ $UCX == 1.15.0 ]; then patch -p0 < ./ucx_malloc.patch ; else patch -p0 < ./ucx1181_malloc.patch; fi 
  mkdir build && cd build 
  ../configure --prefix=$OMPI_DIR --disable-logging --disable-debug --disable-assertions --disable-params-check  \
  --enable-mt --without-cuda 
@@ -167,6 +166,7 @@ cd /build/q-e-qe-${QE_VERSION}
 if [ ${CUDA_CC} = "cpu" ]; then
 cuda_options="--with-cuda=no"
 else
+export CC=nvc
 cuda_options="--with-cuda=yes --with-cuda-cc=${CUDA_CC} --with-cuda-runtime=13.0 --with-cuda-mpi=yes"
 fi
 echo cuda_options $cuda_options
