@@ -82,7 +82,7 @@ mkdir -p /opt/lib || true
 
 export FC=nvfortran && export OMPI=5.0.9 &&export OMPI_DIR=/opt/ompi && export UCX=1.20.0
 
-echo "ls cuda rt available" ls /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/
+echo "ls cuda rt available" $(ls /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/)
 
 export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/"$arch"-linux/ 
 
