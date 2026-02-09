@@ -59,6 +59,9 @@ jobs:
         if [[ -f ~/cache/ompi/lib/libmpi.so ]]; then \
         echo "ompi cache present" ; \
         fi
+        if [[ -f ~/cache/ubuntu_jammy.sif ]]; then \
+        cp ~/cache/ubuntu_jammy.sif ${{ matrix.folder }}/. ; \
+        fi
     - name: Install apptainer
       env:
         APP_VER: 1.2.3
