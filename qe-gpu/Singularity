@@ -90,27 +90,28 @@ export PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin:$PATH
 
 export LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib:"$LD_LIBRARY_PATH" 
 echo 'FC -v ' $("$FC" -v)
+ls -lrt /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/nv*
 
-rm -f nvcc.out && nvcc -V >& nvcc.out && cat nvcc.out && rm nvcc.out 
-set +ex
+#rm -f nvcc.out && nvcc -V >& nvcc.out && cat nvcc.out && rm nvcc.out 
+#set +ex
 
-export ompi_prefix=openmpi-$OMPI\
-&& export ompi_major=$(echo $OMPI | cut -d . -f1) \
-&& echo ompi_major is $ompi_major \
-&& export ompi_minor=$(echo $OMPI | cut -d . -f2) \
-&& echo ompi_minor is $ompi_minor \
-&& echo ompi_major is $ompi_major \
-&& wget --progress=dot:giga  https://github.com/openucx/ucx/releases/download/v$UCX/ucx-$UCX.tar.gz -O - | tar xzf - \
-&& wget  --progress=dot:giga https://download.open-mpi.org/release/open-mpi/v$ompi_major.$ompi_minor/openmpi-$OMPI.tar.gz  -O - | tar xzf -   \
-&& cd ucx-$UCX \
-&& wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi41x.ifx/ucx_malloc.patch \
-&& wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi5x/ucx1181_malloc.patch \
-&& if [[ $UCX == 1.14.1 ]] || [[ $UCX == 1.15.0 ]]; then patch -p0 < ./ucx_malloc.patch ; else patch -p0 < ./ucx1181_malloc.patch; fi \
-&& mkdir build && cd build \
-&& ../configure --prefix=$OMPI_DIR --disable-logging --disable-debug --disable-assertions --disable-params-check  \
- --enable-mt --without-cuda \
-&& make -j4 && make install \
-&&  if [ ! -f $OMPI_DIR/bin/ucx_info ]; then echo ucx_info\ not\ found ; exit 1 ; fi  
+export ompi_prefix=openmpi-$OMPI 
+ export ompi_major=$(echo $OMPI | cut -d . -f1) 
+ echo ompi_major is $ompi_major 
+ export ompi_minor=$(echo $OMPI | cut -d . -f2) 
+ echo ompi_minor is $ompi_minor 
+ echo ompi_major is $ompi_major 
+ wget --progress=dot:giga  https://github.com/openucx/ucx/releases/download/v$UCX/ucx-$UCX.tar.gz -O - | tar xzf - 
+ wget  --progress=dot:giga https://download.open-mpi.org/release/open-mpi/v$ompi_major.$ompi_minor/openmpi-$OMPI.tar.gz  -O - | tar xzf -   
+ cd ucx-$UCX 
+ wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi41x.ifx/ucx_malloc.patch 
+ wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi5x/ucx1181_malloc.patch 
+ if [[ $UCX == 1.14.1 ]] || [[ $UCX == 1.15.0 ]]; then patch -p0 < ./ucx_malloc.patch ; else patch -p0 < ./ucx1181_malloc.patch; fi 
+ mkdir build && cd build 
+ ../configure --prefix=$OMPI_DIR --disable-logging --disable-debug --disable-assertions --disable-params-check  \
+ --enable-mt --without-cuda 
+ make -j4 && make install 
+  if [ ! -f $OMPI_DIR/bin/ucx_info ]; then echo ucx_info\ not\ found ; exit 1 ; fi  
 
 cd ../.. \
 && cd $ompi_prefix     \
