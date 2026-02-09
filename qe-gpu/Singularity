@@ -151,7 +151,7 @@ fi
 && export LD_LIBRARY_PATH=$OMPI_DIR/lib:/opt/lib:$LD_LIBRARY_PATH 
 
 # Download and extract Quantum ESPRESSO
-wget https://github.com/QEF/q-e/archive/qe-${QE_VERSION}.tar.gz \
+wget https://github.com/QEF/q-e/archive/qe-${QE_VERSION}.tar.gz || { echo "QE Download Failure"; exit 1; } \
 && tar -xzf qe-${QE_VERSION}.tar.gz \
 && rm qe-${QE_VERSION}.tar.gz
 
@@ -171,8 +171,8 @@ echo cuda_options $cuda_options
 --enable-openmp \
 --enable-parallel \
 --with-scalapack=yes \
-$cuda_options \
-&& make pw -j$(nproc) \
+$cuda_options|| { echo "config Failure"; exit 1; } \
+&& make pw -j$(nproc) || { echo "compile Failure"; exit 1; }\
 && make cp -j$(nproc) \
 && make ph -j$(nproc) \
 && make pp -j$(nproc) \
