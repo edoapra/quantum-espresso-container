@@ -76,8 +76,11 @@ ls -lrt nv*deb || true
 /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/makelocalrc -x
 rm -f nvhpc*deb  || true
 mkdir -p /opt/lib || true  
-	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.   || true
-	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt/lib/.   || true
+rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.   || true
+rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt/lib/.   || true
+rsync -a  /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/compat/* /opt/lib/. || true
+
+ dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 
  apt-get clean && rm -rf /var/lib/apt/lists/*
 
 export FC=nvfortran && export OMPI=5.0.9 &&export OMPI_DIR=/opt/ompi && export UCX=1.20.0
@@ -101,6 +104,10 @@ export ompi_prefix=openmpi-$OMPI
  export ompi_minor=$(echo $OMPI | cut -d . -f2) 
  echo ompi_minor is $ompi_minor 
  echo ompi_major is $ompi_major 
+ echo 'ls -l /opt/ompi/lib/libmpi.so' $(ls -l /opt/ompi/lib/libmpi.so) || true \
+
+if [ ! -f /opt/ompi/lib/libmpi.so ]; then 
+echo ompi cache missing		    
  wget --progress=dot:giga  https://github.com/openucx/ucx/releases/download/v$UCX/ucx-$UCX.tar.gz -O - | tar xzf - 
  wget  --progress=dot:giga https://download.open-mpi.org/release/open-mpi/v$ompi_major.$ompi_minor/openmpi-$OMPI.tar.gz  -O - | tar xzf -   
  cd ucx-$UCX 
@@ -127,17 +134,20 @@ $ompi_options \
 && head config.log \
 && make FC=$FC  -j 6 \
 && make install     \
-&& if [ ! -f $OMPI_DIR/bin/mpif90 ]; then echo mpif90\ not\ found ; exit 1 ; fi \
-&& echo mpif90 show is $($OMPI_DIR/bin/mpif90 -show) \
 && cd .. ; rm -rf *tar*gz openmpi-* ucx-*  \
-&& echo ' check ucx' \
+&& echo ' check ucx'
+else
+echo ompi cache present
+fi
+ if [ ! -f $OMPI_DIR/bin/mpif90 ]; then echo mpif90\ not\ found ; exit 1 ; fi \
+&& echo mpif90 show is $($OMPI_DIR/bin/mpif90 -show) \
 && if [ ! -f $OMPI_DIR//bin/ucx_info ]; then echo ucx_info\ not\ found ; exit 1 ; fi \
 && echo ' /opt/ompi/bin/ucx_info -v ' `/opt/ompi/bin/ucx_info -v|| true` \
 && echo ' ucx Transports' `/opt/ompi/bin/ucx_info  -d |grep Transport |cut -c 19- || true` \
 && if [ ! -f $OMPI_DIR/bin/mpif90 ]; then echo mpif90\ not\ found ; exit 1 ; fi \
 && echo '********'  \
 && export PATH=$OMPI_DIR/bin:$PATH\
-&& export LD_LIBRARY_PATH=$OMPI_DIR/lib:$LD_LIBRARY_PATH 
+&& export LD_LIBRARY_PATH=$OMPI_DIR/lib:/opt/lib:$LD_LIBRARY_PATH 
 
 # Download and extract Quantum ESPRESSO
 wget https://github.com/QEF/q-e/archive/qe-${QE_VERSION}.tar.gz \
@@ -169,7 +179,8 @@ export CC=pgcc
 mkdir -p /work
 cd /work
 #cleanup
-rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name 12.9)
+rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name 12.9) || true
+rm -rf /opt/nvidia
 # # Add environment setup script
 # RUN echo '#!/bin/bash\n\
 # export CUDA_VISIBLE_DEVICES=${GPU_ID:-0}\n\
