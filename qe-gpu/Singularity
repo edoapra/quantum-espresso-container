@@ -78,7 +78,7 @@ rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt
 rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/x86_64-linux/lib/* /opt/lib/.
 echo "looking for libcuda.so" $(find /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot" -name libcuda.so)
 
-rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/compat/ /opt/lib/.
+rsync -av /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/compat/* /opt/lib/.
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 
  apt-get clean && rm -rf /var/lib/apt/lists/*
 export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/"$arch"-linux/ 
@@ -175,19 +175,19 @@ cd /work
 #cleanup
 rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name 12.9) || true
 rm -rf /opt/nvidia || true
+export LD_LIBRARY_PATH=$OMPI_DIR/lib:/opt/lib
 # # Add environment setup script
 # RUN echo '#!/bin/bash\n\
 # export CUDA_VISIBLE_DEVICES=${GPU_ID:-0}\n\
 # export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}\n\
-# export LD_LIBRARY_PATH="/opt/nvidia/hpc_sdk/Linux_x86_64/24.1/compilers/lib:${LD_LIBRARY_PATH}"\n\
 # exec "$@"' > /entrypoint.sh \
 #     && chmod +x /entrypoint.sh
 
 # ENTRYPOINT ["/entrypoint.sh"]
 # CMD ["pw.x"]
 %environment
-export QE_VERSION="$QE_VERSION"
 export LD_LIBRARY_PATH=/opt/ompi/lib:/opt/lib
+export QE_VERSION="$QE_VERSION"
 %runscript
 cd /work
 exec /bin/bash "$@"
