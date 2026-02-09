@@ -41,8 +41,8 @@ mkdir -p /build
 cd /build
 
 #build ompi ucx
-export ompi_options=' --enable-mca-no-build=coll-han '
- apt-get -y update \
+export ompi_options=' --enable-mca-no-build=coll-han ' 
+apt-get -y update \
 && apt-get -y install -y tzdata git moreutils  wget rsync  sudo ca-certificates \
 && apt-get -y install -y   tar libnl-3-200 libnl-route-3-200 libgomp1 libnuma1 \
  g++ gfortran   make ssh patch   unzip perl-base file \
@@ -51,15 +51,18 @@ export ompi_options=' --enable-mca-no-build=coll-han '
  libnl-3-dev  libnl-route-3-dev udev \
  librdmacm-dev librdmacm1 rdma-core libibverbs-dev  ibverbs-providers  \
  libhwloc-dev libfuse3-dev\
- pkg-config gawk  software-properties-common strace gdb \
-&& nv_year=2025 && nv_major=25 &&  nv_minor=11 &&   nverdot="$nv_major"."$nv_minor" && nverdash="$nv_major"-"$nv_minor" \
-&&  apt-get install -q=2 -y --no-install-recommends g++ libtinfo5  libncursesw5 libnuma1 ; wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg/"nvhpc-"$nverdash"_"$nverdot"_$arch_dpkg.deb >& log1 ; wget --progress=dot:giga  https://developer.download.nvidia.com/hpc-sdk/ubuntu/$arch_dpkg/nvhpc-"$nv_year"_"$nverdot"_"$arch_dpkg".deb >&  log2 ; tail -n 2 log1 log2; ls -lrt nv*deb;  dpkg -i nvhpc*deb ; 	 /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/makelocalrc -x  ;   rm -f nvhpc*deb ; mkdir -p /opt/lib || true;  \
+ pkg-config gawk  software-properties-common strace gdb 
+ nv_year=2025 && nv_major=25 &&  nv_minor=11 &&   nverdot="$nv_major"."$nv_minor" && nverdash="$nv_major"-"$nv_minor" \
+	    && arch=$(uname -m) \
+	    && echo arch is "$arch" \
+	    && arch_dpkg=$(dpkg --print-architecture)  
+  apt-get install -q=2 -y --no-install-recommends g++ libtinfo5  libncursesw5 libnuma1 ; wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg/"nvhpc-"$nverdash"_"$nverdot"_$arch_dpkg.deb >& log1 ; wget --progress=dot:giga  https://developer.download.nvidia.com/hpc-sdk/ubuntu/$arch_dpkg/nvhpc-"$nv_year"_"$nverdot"_"$arch_dpkg".deb >&  log2 ; tail -n 2 log1 log2; ls -lrt nv*deb;  dpkg -i nvhpc*deb ; 	 /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin/makelocalrc -x  ;   rm -f nvhpc*deb ; mkdir -p /opt/lib || true  \
 &&	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.  \
-&&	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/*/lib64/*.so* /opt/lib/.   \
-&& apt-get clean \
+&&	    rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/*/lib64/*.so* /opt/lib/.   
+ apt-get clean \
 && rm -rf /var/lib/apt/lists/* \
 && export FC=nvfortran && export OMPI=5.0.9 &&export OMPI_DIR=/opt/ompi && export UCX=1.20.0 \
-&& export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/25.11/cuda/13.0/targets/x86_64-linux/ \
+&& export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/"$arch"-linux/ \
             &&  export PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/bin:"$PATH" \
             &&  export LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib:"$LD_LIBRARY_PATH" \
 	    && echo 'FC -v ' $("$FC" -v) \
@@ -80,7 +83,7 @@ export ompi_options=' --enable-mca-no-build=coll-han '
 && ../configure --prefix=$OMPI_DIR --disable-logging --disable-debug --disable-assertions --disable-params-check  \
  --enable-mt --without-cuda \
 && make -j4 && make install \
-&& if [ ! -f $OMPI_DIR/bin/ucx_info ]; then echo ucx_info\ not\ found ; exit 1 ; fi  
+&&  if [ ! -f $OMPI_DIR/bin/ucx_info ]; then echo ucx_info\ not\ found ; exit 1 ; fi  
 
 cd ../.. \
 && cd $ompi_prefix     \
