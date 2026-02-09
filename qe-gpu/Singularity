@@ -62,7 +62,9 @@ apt-get -y update \
  
 if [ $CUDA_CC = "cpu" ]; then
 export FC=gfortran
+export CC=gcc
 else
+export CC=nvc 
 export FC=nvfortran
  nv_year=2025 && nv_major=25 &&  nv_minor=11 &&   nverdot="$nv_major"."$nv_minor" && nverdash="$nv_major"-"$nv_minor" \
 	    && arch=$(uname -m) \
@@ -70,7 +72,7 @@ export FC=nvfortran
 	    && arch_dpkg=$(dpkg --print-architecture)
 	    echo nverdash $nverdash
 	    echo nverdot $nverdot
-apt-get install -q=2 -y --no-install-recommends g++ libtinfo5  libncursesw5 libnuma1 libopenblas-serial-dev
+apt-get install -q=2 -y --no-install-recommends g++ libtinfo5  libncursesw5 libnuma1 libopenblas-serial-dev libfftw3-dev
 set -ex
 wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"_"$nverdot"-0_"$arch_dpkg".deb
 wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"-cuda-multi_"$nverdot"-0_"$arch_dpkg".deb
@@ -122,7 +124,6 @@ echo ompi cache missing
 
 cd ../.. \
 && cd $ompi_prefix     \
-&& export CC=nvc \
 && ./configure  --prefix=$OMPI_DIR --with-ucx=$OMPI_DIR --enable-mca-no-build=btl-uct   \
 $ompi_options \
 --enable-mpi1-compatibility --with-slurm --without-tm --without-lsf  \
