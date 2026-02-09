@@ -68,14 +68,10 @@ jobs:
     - name: create sif from docker
       if: steps.setup-cache.outputs.cache-hit != 'true'
       run: |
-        ls -lrta
-        pwd
         cd ${{ matrix.folder }}
         apptainer pull docker://ubuntu:jammy
     - name: build an apptainer container
       run: |
-        env|grep GITH
-        ls -lrta
         pwd
         cd ${{ matrix.folder }}
         ls -lart
