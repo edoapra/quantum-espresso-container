@@ -96,3 +96,9 @@ jobs:
         tries=0 ; until [ "$tries" -ge 5 ] ; do \
         apptainer push ${{ matrix.folder }}/${{ matrix.folder }}.simg ${{ env.tag }}:latest && break ; \
         tries=$((tries+1)) ; echo push2 attempt no.  $tries    ; sleep 30 ; done
+    - name: ldd check
+      run: |
+        pwd
+        ls -la
+        apptainer pull -F ${{ env.tag }}:${{ env.date }}
+        apptainer exec ${{ env.tag }}:latest ldd /usr/local/bin/pw.x
