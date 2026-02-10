@@ -78,7 +78,7 @@ echo CUDA_RUNTIME is $CUDA_RUNTIME
 ##rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/x86_64-linux/lib/* /opt/lib/.
 echo "looking for libcuda.so" $(find /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot" -name libcuda.so)
 
-rsync -av /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/compat/* /opt/lib/.
+#rsync -av /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/compat/* /opt/lib/.
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 
  apt-get clean && rm -rf /var/lib/apt/lists/*
 export CUDA_ROOT=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/"$arch"-linux/ 
