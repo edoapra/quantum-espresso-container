@@ -99,9 +99,15 @@ export ompi_prefix=openmpi-$OMPI
  echo 'ls -l /opt/ompi/lib/libmpi.so' $(ls -l /opt/ompi/lib/libmpi.so) || true \
 
 if [ ! -f /opt/ompi/lib/libmpi.so ]; then 
-echo ompi cache missing		    
+echo ompi cache missing
+wget --progress=dot:giga https://github.com/openpmix/openpmix/releases/download/v5.0.10/pmix-5.0.10.tar.gz -O - | tar xzf -
  wget --progress=dot:giga  https://github.com/openucx/ucx/releases/download/v$UCX/ucx-$UCX.tar.gz -O - | tar xzf - 
- wget  --progress=dot:giga https://download.open-mpi.org/release/open-mpi/v$ompi_major.$ompi_minor/openmpi-$OMPI.tar.gz  -O - | tar xzf -   
+ wget  --progress=dot:giga https://download.open-mpi.org/release/open-mpi/v$ompi_major.$ompi_minor/openmpi-$OMPI.tar.gz  -O - | tar xzf -
+ cd pmix-*
+ mkdir build && cd build
+ ../configure --prefix=$OMPI_DIR
+  make -j4 && make install
+  cd ../..
  cd ucx-$UCX 
  wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi41x.ifx/ucx_malloc.patch 
  wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi5x/ucx1181_malloc.patch 
@@ -120,7 +126,7 @@ $ompi_options \
  --without-sge --without-alps --without-lustre --disable-memchecker \
  --without-hcoll --disable-static  \
  --disable-mpi-java --enable-dlopen --with-cuda=$CUDA_ROOT  \
- --without-munge \
+ --with-pmix=$OMPI_DIR --without-munge \
   FC=$FC  \
 && head config.log \
 && make FC=$FC  -j 6 \
