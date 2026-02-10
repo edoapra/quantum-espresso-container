@@ -177,9 +177,9 @@ rm -rf $(find /opt/nvidia/hpc_sdk/Linux_"$arch" -name "12.?") || true
 rm -rf /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/profilers
 rm -rf /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/comm_libs
 rm -f $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name lib*a)
-rm -f $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name bin)
-rm -f $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name share)
-rm -f $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name nvvm)
+rm -rf $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name bin)
+rm -rf $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name share)
+rm -rf $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name nvvm)
 #rm -rf /opt/nvidia || true
 #export LD_LIBRARY_PATH=$OMPI_DIR/lib:/opt/lib
 # # Add environment setup script
