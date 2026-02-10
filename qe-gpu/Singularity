@@ -173,7 +173,7 @@ $cuda_options|| { echo "config Failure"; exit 1; } \
 mkdir -p /work
 cd /work
 #cleanup
-#rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name 12.9) || true
+rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name "12.?") || true
 #rm -rf /opt/nvidia || true
 #export LD_LIBRARY_PATH=$OMPI_DIR/lib:/opt/lib
 # # Add environment setup script
