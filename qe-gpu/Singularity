@@ -60,7 +60,7 @@ export FC=nvfortran
 	    echo nverdot $nverdot
 set -ex
 wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"_"$nverdot"-0_"$arch_dpkg".deb
-wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"-cuda-multi_"$nverdot"-0_"$arch_dpkg".deb
+#wget  --progress=dot:giga https://developer.download.nvidia.com/hpc-sdk/ubuntu/"$arch_dpkg"/nvhpc-"$nverdash"-cuda-multi_"$nverdot"-0_"$arch_dpkg".deb
 ls -lrt nv*deb || true
  dpkg -i *deb
 
