@@ -73,9 +73,9 @@ export LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/li
 echo "ls cuda rt available" $(ls /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/)
 CUDA_RUNTIME=$(nvcc --version |grep Cuda\ compilation | cut -d " " -f 5|sed -e s'/,//')
 echo CUDA_RUNTIME is $CUDA_RUNTIME
-rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.   || true
-rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt/lib/.   || true
-rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/x86_64-linux/lib/* /opt/lib/.
+#rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/compilers/lib/*.so* /opt/lib/.   || true
+#rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/math_libs/lib64/*.so* /opt/lib/.   || true
+##rsync -a /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/targets/x86_64-linux/lib/* /opt/lib/.
 echo "looking for libcuda.so" $(find /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot" -name libcuda.so)
 
 rsync -av /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/cuda/"$CUDA_RUNTIME"/compat/* /opt/lib/.
@@ -173,7 +173,10 @@ $cuda_options|| { echo "config Failure"; exit 1; } \
 mkdir -p /work
 cd /work
 #cleanup
-rm -rf $(find /opt/nvidia/hpc_sdk/Linux_x86_64 -name "12.?") || true
+rm -rf $(find /opt/nvidia/hpc_sdk/Linux_"$arch" -name "12.?") || true
+rm -rf /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/profilers
+rm -rf /opt/nvidia/hpc_sdk/Linux_"$arch"/"$nverdot"/comm_libs
+rm -f $(find  /opt/nvidia/hpc_sdk/Linux_"$arch" -name lib*a)
 #rm -rf /opt/nvidia || true
 #export LD_LIBRARY_PATH=$OMPI_DIR/lib:/opt/lib
 # # Add environment setup script
