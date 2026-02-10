@@ -106,7 +106,8 @@ wget --progress=dot:giga https://github.com/openpmix/openpmix/releases/download/
  wget  --progress=dot:giga https://download.open-mpi.org/release/open-mpi/v$ompi_major.$ompi_minor/openmpi-$OMPI.tar.gz  -O - | tar xzf -
  cd ucx-$UCX 
  wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi41x.ifx/ucx_malloc.patch 
- wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi5x/ucx1181_malloc.patch 
+ wget https://raw.githubusercontent.com/edoapra/nwchem-singularity/master/nwchem-dev.ompi5x/ucx1181_malloc.patch
+ echo UCX is $UCX
  if [ $UCX = 1.14.1 ] || [ $UCX = 1.15.0 ]; then patch -p0 < ./ucx_malloc.patch ; else patch -p0 < ./ucx1181_malloc.patch; fi 
  mkdir build && cd build 
  ../configure --prefix=$OMPI_DIR --disable-logging --disable-debug --disable-assertions --disable-params-check  \
@@ -117,7 +118,7 @@ wget --progress=dot:giga https://github.com/openpmix/openpmix/releases/download/
 cd ../.. 
  cd pmix-*
  mkdir build && cd build
- ../configure --prefix=$OMPI_DIR --without-munge
+ ../configure --prefix=$OMPI_DIR 
   make -j4 && make install
   cd ../..
  cd $ompi_prefix     \
@@ -127,12 +128,12 @@ $ompi_options \
  --without-sge --without-alps --without-lustre --disable-memchecker \
  --without-hcoll --disable-static  \
  --disable-mpi-java --enable-dlopen --with-cuda=$CUDA_ROOT  \
- --with-pmix=$OMPI_DIR --without-munge \
+ --with-pmix=$OMPI_DIR  \
   FC=$FC  \
 && head config.log \
 && make FC=$FC  -j 6 \
 && make install     \
-&& cd .. ; rm -rf *tar*gz openmpi-* ucx-*  \
+&& cd .. ; rm -rf *tar*gz openmpi-* ucx-* pmix* \
 && echo ' check ucx'
 else
 echo ompi cache present
